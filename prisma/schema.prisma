@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Chat {
+  id             String       @id @default(uuid())
+  hashIpAddress  String?
+  createdAt      DateTime     @default(now())
+  name           String       @default("")
+  isFavorite     Boolean      @default(false)
+  isShared       Boolean      @default(false)
+  geo            Json?
+  chartData      ChartData?
+  messages       Message[]
+  sharedAsParent SharedChat[] @relation("Parent")
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  role       String
+  content    String
+  createdAt  DateTime @default(now())
+  chatId     String?
+  isLiked    Boolean  @default(false)
+  isDisliked Boolean  @default(false)
+  chat       Chat?    @relation(fields: [chatId], references: [id], onDelete: Cascade)
+}
+
+model Parts {
+  id         String  @id @default(uuid())
+  partId     Int
+  isFavorite Boolean
+  ipAddress  String
+}
+
+model ChartData {
+  id        String   @id @default(uuid())
+  data      String
+  createdAt DateTime @default(now())
+  chatId    String   @unique
+  summary   String
+  prompt    String   @default("")
+  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+}
+
+model FeedContent {
+  id      String @id @default(uuid())
+  content String
+  summary String
+}
+
+model SharedChat {
+  id           String   @id @default(uuid())
+  parentChatId String
+  createdAt    DateTime @default(now())
+  parentChat   Chat     @relation("Parent", fields: [parentChatId], references: [id], onDelete: Cascade)
+}
+
+model MacroLens {
+  id   String @id @default(uuid())
+  data Json
+}
+
+model articles {
+  id              String    @id() @default(uuid())
+  title           String?
+  url             String    @unique
+  published       DateTime? @db.Timestamptz(6)
+  authors         String?
+  text            String?   @db.Text
+  image           String?
+  isTextGenerated Boolean   @default(false)
+  date_crawled    DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model IpInformation {
+  id               String @id @default(uuid())
+  ip_address       String
+  confidence_score String
+  location         Json
+  company          Json
+}
+
+model IpGeoInformation {
+  id       String @id @default(uuid())
+  ip       String @unique
+  city     String
+  region   String
+  country  String
+  loc      String
+  postal   String
+  timezone String
+}
+
+model HomePageChartData {
+  id        String   @id @default(uuid())
+  data      Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
