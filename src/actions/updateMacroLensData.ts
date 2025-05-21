@@ -74,15 +74,18 @@ export const updateMacroLensData = async () => {
         }
       }
 
-      // Delete
-      await prisma.macroLens.deleteMany();
+      const existing = await prisma.macroLens.findFirst();
 
-      // Create
-      await prisma.macroLens.create({
-        data: {
-          data: data,
-        },
-      });
+      if (existing) {
+        await prisma.macroLens.update({
+          where: { id: existing.id },
+          data: { data: data },
+        });
+      } else {
+        await prisma.macroLens.create({
+          data: { data: data },
+        });
+      }
 
       console.log("Macro Lens Data Updated ");
     } catch (error) {

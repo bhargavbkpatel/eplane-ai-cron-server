@@ -42,7 +42,7 @@ export const updateStockData = async () => {
       }
     }
     const data = extractCompanyMetrics(allDocs);
-    console.log(data);
+
     const existing = await prisma.homePageChartData.findFirst();
 
     if (existing) {

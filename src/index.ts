@@ -14,11 +14,12 @@ const client = new pg.Client({
 });
 
 const app = express();
+const port = process.env.PORT || 3000;
 
 const listenForArticles = async () => {
   try {
     await client.connect();
-    console.log("Connected to database for notifications");
+    console.log("Connected to database!!");
 
     client.on("notification", (notification) => {
       try {
@@ -49,8 +50,6 @@ cron.schedule("0 0 1 * * *", () => {
   console.log("[Cron] Running scheduled Macro lens data...");
   // updateMacroLensData();
 });
-
-const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
   console.log(`Server running at ${port}`);
