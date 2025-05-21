@@ -36,6 +36,8 @@ export async function textToMarkdown(content: string) {
       13. Ensure all plain links (e.g., http://example.com) are converted to **Markdown links only**, not as images. Use the format [link text](http://example.com).
       14. Convert any image links (e.g., direct URLs ending in .jpg, .png, .gif) to Markdown image syntax using the format "![alt text](image URL)".
       15. Check if the link is an image or URL—use ![alt text](link) for images and [label](link) for regular URLs; this step is important, so don't forget.
+      16. **Remove any copyright statements, copyright notices, or boilerplate copyright disclaimers (such as "© 2025 Example News, All Rights Reserved", "Copyright 2025 by [Publisher]", or similar legal copyright text) found anywhere in the content while converting to Markdown. Do not remove or alter any other part of the article.**
+      17. **Ignore and omit any links (including images) that use "example.com", "example.org", "example.net", "test.com", "dummy.com", or any other domain that appears to be a placeholder, dummy, or test URL. Do not include these links in the output at all.**
 
       CUT-OFF CHECK:
         - If the content appears cut off (e.g., incomplete sentence or ending mid-thought), add **1–2 lines** that:
