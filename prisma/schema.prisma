@@ -68,7 +68,7 @@ model MacroLens {
 
 model articles {
   id              String    @id() @default(uuid())
-  title           String?
+  title           String?   @unique
   url             String    @unique
   published       DateTime? @db.Timestamptz(6)
   authors         String?

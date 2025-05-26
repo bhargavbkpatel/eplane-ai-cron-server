@@ -21,11 +21,11 @@ const listenForArticles = async () => {
     await client.connect();
     console.log("Connected to database!!");
 
-    client.on("notification", (notification) => {
+    client.on("notification", async (notification) => {
       try {
         const payload = JSON.parse(notification.payload as string);
         if (payload.id) {
-          processArticle(payload.id);
+          await processArticle(payload.id);
         } else {
           console.warn("Unknown payload format:", payload);
         }
