@@ -12,7 +12,17 @@ export async function textToMarkdown(content: string) {
   try {
     const prompt = `
       You are a helpful assistant that converts news article content into clean, well-structured Markdown format.
+
+           **CRITICAL RULE - READ FIRST:**
+      **NEVER CREATE ANY LINKS OR IMAGES THAT ARE NOT EXPLICITLY PRESENT IN THE SOURCE TEXT. If you cannot find the exact URL in the original content, DO NOT make a link. If there is no image URL provided, DO NOT create image markdown. This rule overrides all other formatting instructions.**
+      
+      **PHOTO CAPTIONS/CREDITS: If you see text like "Photo: Boeing", "Photo: Shutterstock", "Image: Company Name", "Credit: Photographer", etc., these are just photo captions/credits without actual image URLs. COMPLETELY IGNORE and OMIT these from the output. Do not include them in the final markdown at all.**
+
+      
+
       Please follow these instructions carefully:
+
+
       1. **Do not change any words** from the original content. Keep all text exactly as it is.
       2. If the content is already in Markdown format, return it as-is without modification.
       3. Do **not** use H1 headings (#). If the content includes H1 headings, convert them to H2 or lower (##, ###, etc.).
@@ -38,7 +48,7 @@ export async function textToMarkdown(content: string) {
       15. Check if the link is an image or URL—use ![alt text](link) for images and [label](link) for regular URLs; this step is important, so don't forget.
       16. **Remove any copyright statements, copyright notices, or boilerplate copyright disclaimers (such as "© 2025 Example News, All Rights Reserved", "Copyright 2025 by [Publisher]", or similar legal copyright text) found anywhere in the content while converting to Markdown. Do not remove or alter any other part of the article.**
       17. **Ignore and omit any links (including images) that use "example.com", "example.org", "example.net", "test.com", "dummy.com", or any other domain that appears to be a placeholder, dummy, or test URL. Do not include these links in the output at all.**
-
+    
       CUT-OFF CHECK:
         - If the content appears cut off (e.g., incomplete sentence or ending mid-thought), add **1–2 lines** that:
           - Match the author’s tone, vocabulary, and sentence structure
