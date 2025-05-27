@@ -6,6 +6,7 @@ import pg from "pg";
 import { processArticle } from "./actions/processArticles";
 import { updateStockData } from "./actions/updateStockData";
 import { updateMacroLensData } from "./actions/updateMacroLensData";
+import { getSecrets } from "lib/getSecrects";
 
 dotenv.config();
 
@@ -18,6 +19,8 @@ const port = process.env.PORT || 3000;
 
 const listenForArticles = async () => {
   try {
+    const secret = await getSecrets();
+    console.log(JSON.parse(secret), "secret");
     await client.connect();
     console.log("Connected to database!!");
 
