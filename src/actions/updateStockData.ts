@@ -1,6 +1,5 @@
 import axios from "axios";
 import logger from "utils/logger/logger";
-import { GURUFOCUS_API_KEY } from "../config/env.config";
 import { stockSymbols } from "../lib/constants";
 import {
   extractCompanyMetrics,
@@ -8,6 +7,8 @@ import {
   flattenForIndex,
 } from "../lib/helpers/flattenForIndex";
 import { prisma } from "../lib/prisma";
+
+const GURUFOCUS_API_KEY = process.env.GURUFOCUS_API_KEY;
 
 export const updateStockData = async () => {
   try {

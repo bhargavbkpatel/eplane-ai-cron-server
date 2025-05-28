@@ -1,6 +1,5 @@
 import axios from "axios";
 import { prisma } from "../lib/prisma";
-import { ELASTIC_API_KEY, ELASTICSEARCH_URL } from "../config/env.config";
 import logger from "utils/logger/logger";
 
 const INVENTORY_FIELDS = [
@@ -13,7 +12,8 @@ const INVENTORY_FIELDS = [
   "Cost of Goods Sold",
   "COGS-to-Revenue",
 ];
-
+const ELASTIC_API_KEY = process.env.ELASTIC_API_KEY;
+const ELASTICSEARCH_URL = process.env.ELASTICSEARCH_URL;
 export const updateMacroLensData = async () => {
   try {
     const currentYear = new Date().getFullYear();
