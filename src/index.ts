@@ -6,8 +6,10 @@ import logger from "utils/logger/logger";
 import { processArticle } from "./actions/processArticles";
 import { updateStockData } from "./actions/updateStockData";
 import { updateMacroLensData } from "./actions/updateMacroLensData";
+import { getSecrets } from "lib/getSecrects";
 import { errorHandler } from "lib/middleware/errorHandler";
 import { retry } from "utils/retry/retry";
+
 
 dotenv.config();
 
@@ -26,6 +28,8 @@ app.use(errorHandler);
 
 const listenForArticles = async (): Promise<void> => {
   try {
+    const secret = await getSecrets();
+    console.log(JSON.parse(secret), "secret");
     await client.connect();
     logger.info("Connected to database");
 
