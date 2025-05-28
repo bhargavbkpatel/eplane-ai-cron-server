@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { OPENAI_API_KEY } from "../config/env.config";
+import logger from "./logger/logger";
 const openai = new OpenAI({
   apiKey: OPENAI_API_KEY,
 });
@@ -8,7 +9,7 @@ export const sleep = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
-export async function textToMarkdown(content: string) {
+export async function textToMarkdown(content: string): Promise<string | null> {
   try {
     const prompt = `
       You are a helpful assistant that converts news article content into clean, well-structured Markdown format.
@@ -75,7 +76,7 @@ export async function textToMarkdown(content: string) {
 
     return response?.choices[0]?.message?.content;
   } catch (error) {
-    console.error("Failed to convert text to markdown", error);
-    throw error;
+    logger.error("Failed to convert text to markdown", { error });
+    return null;
   }
 }

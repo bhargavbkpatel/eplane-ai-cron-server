@@ -1,6 +1,7 @@
 import axios from "axios";
 import { prisma } from "../lib/prisma";
 import { ELASTIC_API_KEY, ELASTICSEARCH_URL } from "../config/env.config";
+import logger from "utils/logger/logger";
 
 const INVENTORY_FIELDS = [
   "Inventory Turnover",
@@ -37,6 +38,7 @@ export const updateMacroLensData = async () => {
     };
 
     try {
+      logger.info("Fetching inventory data from Elasticsearch", {});
       const response = await axios.post(
         `${ELASTICSEARCH_URL}/stocks_financials_quarterly/_search`,
         query,
@@ -81,17 +83,19 @@ export const updateMacroLensData = async () => {
           where: { id: existing.id },
           data: { data: data },
         });
+        logger.info("Macro Lens data updated in database", { id: existing.id });
       } else {
         await prisma.macroLens.create({
           data: { data: data },
         });
+        logger.info("Macro Lens data created in database", {});
       }
-
-      console.log("Macro Lens Data Updated ");
     } catch (error) {
-      console.error("Error fetching inventory data:", error);
+      logger.error("Error fetching inventory data from Elasticsearch", {
+        error,
+      });
     }
   } catch (error) {
-    console.error("Error storing macro lends data in database!!", error);
+    logger.error("Error storing Macro Lens data in database", { error });
   }
 };

@@ -1,4 +1,5 @@
 import axios from "axios";
+import logger from "utils/logger/logger";
 import { GURUFOCUS_API_KEY } from "../config/env.config";
 import { stockSymbols } from "../lib/constants";
 import {
@@ -31,14 +32,10 @@ export const updateStockData = async () => {
           allDocs.push({ companyName, ...row });
         }
       } catch (error) {
-        if (error instanceof Error) {
-          console.error(
-            ":x: Error updating homepage chart data:",
-            error.message
-          );
-        } else {
-          console.error(":x: Error updating homepage chart data:", error);
-        }
+        logger.error("Error fetching data for symbol", {
+          symbol,
+          error: error instanceof Error ? error.message : error,
+        });
       }
     }
     const data = extractCompanyMetrics(allDocs);
@@ -50,17 +47,16 @@ export const updateStockData = async () => {
         where: { id: existing.id },
         data: { data: data },
       });
+      logger.info("Updated homePageChartData in database", { id: existing.id });
     } else {
       await prisma.homePageChartData.create({
         data: { data: data },
       });
+      logger.info("Created new homePageChartData in database");
     }
-    console.log("Stock Data Updated");
   } catch (error) {
-    if (error instanceof Error) {
-      console.error(":x: Error updating homepage chart data:", error.message);
-    } else {
-      console.error(":x: Error updating homepage chart data:", error);
-    }
+    logger.error("Error updating homepage chart data", {
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
