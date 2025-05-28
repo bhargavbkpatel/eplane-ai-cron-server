@@ -20,7 +20,8 @@
     "express": "^5.1.0",
     "node-cron": "^3.0.3",
     "openai": "^4.98.0",
-    "pg": "^8.16.0"
+    "pg": "^8.16.0",
+    "winston": "^3.17.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.1",
