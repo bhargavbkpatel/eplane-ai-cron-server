@@ -2,3 +2,5 @@ node_modules
 /build
 .env
 logs
+.DS_Store
+__MACOSX

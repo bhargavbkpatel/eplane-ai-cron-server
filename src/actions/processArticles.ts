@@ -1,6 +1,7 @@
-import logger from "utils/logger/logger";
+import logger from "../utils/logger/logger";
 import { prisma } from "../lib/prisma";
 import { sleep, textToMarkdown } from "../utils";
+import { Prisma } from "@prisma/client";
 
 export const processArticle = async (id: string) => {
   try {
@@ -14,7 +15,7 @@ export const processArticle = async (id: string) => {
     }
     const markdownText = article.text ? await textToMarkdown(article.text) : "";
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       await tx.articles.update({
         where: { id: article.id },
         data: {

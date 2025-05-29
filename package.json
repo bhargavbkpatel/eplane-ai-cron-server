@@ -4,14 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npx prisma generate && tsc",
+    "build": "tsc",
     "dev": "nodemon",
     "start": "tsx build/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
     "@aws-sdk/client-secrets-manager": "^3.817.0",
     "@prisma/client": "^6.7.0",

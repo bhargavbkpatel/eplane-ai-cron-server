@@ -1,42 +1,38 @@
-FROM node:20-alpine AS builder
-
+FROM node:20-alpine AS build
 WORKDIR /app
 
-RUN apk add --no-cache \
-    python3 \
-    make \
-    g++ \
-    openssl
-
+# Install dependencies
 COPY package*.json ./
+RUN npm ci
 
-# Install all dependencies including devDependencies
-RUN npm ci --include=dev
+# Copy schema and source files
+COPY prisma ./prisma
+COPY tsconfig.json ./
+COPY src ./src
 
-# Copy source files
-COPY . .
-
-# Build the code
+# Build TypeScript
 RUN npm run build
 
-# Production image
+# ---- Production Stage ----
 FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy built assets from builder
-COPY --from=builder /app/build ./build
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/prisma ./prisma
-
-# Install production dependencies
+# Copy package files and install only production deps
+COPY package*.json ./
 RUN npm ci --omit=dev
+    
+# Copy prisma schema and run prisma generate
+COPY prisma ./prisma
+RUN npx prisma generate
 
-# Environment variables (set these in ECS task definition)
-ENV NODE_ENV production
-ENV PORT 3000
+# Copy built app
+COPY --from=build /app/build ./build
 
-EXPOSE ${PORT}
+# Set environment
+ENV NODE_ENV=production
 
+EXPOSE 3000
+
+# Start server
 CMD ["node", "build/index.js"]

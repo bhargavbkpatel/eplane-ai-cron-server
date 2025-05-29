@@ -1,5 +1,4 @@
 import axios from "axios";
-import logger from "utils/logger/logger";
 import { stockSymbols } from "../lib/constants";
 import {
   extractCompanyMetrics,
@@ -7,6 +6,7 @@ import {
   flattenForIndex,
 } from "../lib/helpers/flattenForIndex";
 import { prisma } from "../lib/prisma";
+import logger from "../utils/logger/logger";
 
 const GURUFOCUS_API_KEY = process.env.GURUFOCUS_API_KEY;
 

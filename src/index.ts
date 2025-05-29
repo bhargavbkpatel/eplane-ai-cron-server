@@ -1,14 +1,15 @@
-import { loadSecrets } from "config/env.config";
 import dotenv from "dotenv";
 import express from "express";
-import { errorHandler } from "lib/middleware/errorHandler";
 import cron from "node-cron";
 import { Client } from "pg";
-import logger from "utils/logger/logger";
-import { retry } from "utils/retry/retry";
 import { processArticle } from "./actions/processArticles";
 import { updateMacroLensData } from "./actions/updateMacroLensData";
+
 import { updateStockData } from "./actions/updateStockData";
+import { loadSecrets } from "./config/env.config";
+import { errorHandler } from "./lib/middleware/errorHandler";
+import logger from "./utils/logger/logger";
+import { retry } from "./utils/retry/retry";
 
 dotenv.config();
 

@@ -1,15 +1,14 @@
 import {
-  SecretsManagerClient,
   GetSecretValueCommand,
+  SecretsManagerClient,
 } from "@aws-sdk/client-secrets-manager";
-import logger from "utils/logger/logger";
+import logger from "../utils/logger/logger";
 
-const secret_name = "dev/secrets"; // Replace with your secret name
+const secret_name = process.env.SECRET_NAME;
 
 const client = new SecretsManagerClient({
-  region: "eu-north-1", // Replace with your AWS region
+  region: process.env.AWS_REGION,
 });
-
 export const getSecrets = async () => {
   try {
     const response = await client.send(

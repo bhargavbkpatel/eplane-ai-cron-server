@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from "express";
-import logger from "utils/logger/logger";
+import { NextFunction, Request, Response } from "express";
+import logger from "../../utils/logger/logger";
 
 export const errorHandler = (
   err: Error & { statusCode?: number; extraData?: Record<string, unknown> },

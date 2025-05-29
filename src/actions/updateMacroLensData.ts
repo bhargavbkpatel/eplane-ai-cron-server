@@ -1,6 +1,6 @@
 import axios from "axios";
 import { prisma } from "../lib/prisma";
-import logger from "utils/logger/logger";
+import logger from "../utils/logger/logger";
 
 const INVENTORY_FIELDS = [
   "Inventory Turnover",
