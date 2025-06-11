@@ -1,9 +1,7 @@
-import OpenAI from "openai";
 import logger from "./logger/logger";
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const openai = new OpenAI({
-  apiKey: OPENAI_API_KEY,
-});
+import { getOpenAIClient } from "./openai.client";
+
+const openai = getOpenAIClient();
 
 export const sleep = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
