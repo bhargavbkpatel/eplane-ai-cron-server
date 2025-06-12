@@ -32,10 +32,28 @@ model Message {
 }
 
 model Parts {
-  id         String  @id @default(uuid())
-  partId     Int
-  isFavorite Boolean
-  ipAddress  String
+  id                        String   @id @default(uuid())
+  active_vendors            String   @default("")
+  ai_analytics              Json?
+  avg_availability          Int      @default(0)
+  certificate_availability  Boolean  @default(false)
+  condition                 String[]
+  country                   String
+  createdAt                 DateTime @default(now())
+  days_until_next_update    Int      @default(0)
+  machine_learning_insights Json?
+  part_number               String
+  part_number_cleaned       String
+  performance_metrics       Json?
+  posted_ts                 DateTime
+  predictive_features       Json?
+  product_description       String
+  quantity                  Int      @default(0)
+  region                    String
+  status                    Status
+  title                     String
+  updated_at                DateTime
+  viewersCount              Int      @default(0)
 }
 
 model ChartData {
@@ -74,16 +92,19 @@ model articles {
   authors         String?
   text            String?   @db.Text
   image           String?
-  isTextGenerated Boolean   @default(false)
   date_crawled    DateTime? @default(now()) @db.Timestamp(6)
+  isTextGenerated Boolean   @default(false)
+  rank            Int       @default(0)
+  image_keywords  Json[]    @default([])
 }
 
 model IpInformation {
-  id               String @id @default(uuid())
+  id               String   @id @default(uuid())
   ip_address       String
   confidence_score String
   location         Json
   company          Json
+  createdAt        DateTime @default(now())
 }
 
 model IpGeoInformation {
@@ -102,4 +123,27 @@ model HomePageChartData {
   data      Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model ArticleReaction {
+  id        String       @id
+  articleId String
+  ipAddress String
+  type      ReactionType
+  createdAt DateTime     @default(now())
+
+  @@unique([articleId, ipAddress])
+}
+
+enum ReactionType {
+  LIKE
+  DISLIKE
+  DOUBLE_LIKE
+}
+
+enum Status {
+  stock
+  instock
+  Reserved
+  in_Repair
 }
