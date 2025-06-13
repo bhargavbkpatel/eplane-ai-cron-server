@@ -2,10 +2,6 @@ import dotenv from "dotenv";
 import express from "express";
 import cron from "node-cron";
 import { Client } from "pg";
-import { processArticle } from "./actions/processArticles";
-import { updateMacroLensData } from "./actions/updateMacroLensData";
-
-import { updateStockData } from "./actions/updateStockData";
 import { loadSecrets } from "./config/env.config";
 import { errorHandler } from "./lib/middleware/errorHandler";
 import logger from "./utils/logger/logger";
@@ -29,7 +25,11 @@ const initializeApp = async () => {
     if (!DATABASE_URL) {
       throw new Error("DATABASE_URL is not defined after loading secrets.");
     }
-
+    const { processArticle } = await import("./actions/processArticles");
+    const { updateMacroLensData } = await import(
+      "./actions/updateMacroLensData"
+    );
+    const { updateStockData } = await import("./actions/updateStockData");
     const client = new Client({
       connectionString: DATABASE_URL,
     });
