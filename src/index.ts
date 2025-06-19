@@ -1,41 +1,33 @@
-import dotenv from "dotenv";
 import express from "express";
 import cron from "node-cron";
 import { Client } from "pg";
-import { loadSecrets } from "./config/env.config";
+import { loadConfig } from "./config/env.config";
+import { loadEnvironment } from "./config/environment";
 import { errorHandler } from "./lib/middleware/errorHandler";
 import logger from "./utils/logger/logger";
 import { retry } from "./utils/retry/retry";
 
-dotenv.config();
-
 const initializeApp = async () => {
   try {
-    // Load secrets on initialization
-    logger.info("Loading secrets from AWS Secrets Manager...");
-    await loadSecrets();
-    logger.info("Secrets loaded successfully");
-
-    if (!process.env.CRON_SECRET) {
+    // Load environment variables
+    await loadEnvironment();
+    const config = await loadConfig();
+    if (!config.CRON_SECRET) {
       logger.error("CRON_SECRET is not defined. Exiting application.");
       process.exit(1);
     }
 
-    const DATABASE_URL = process.env.DATABASE_URL;
-    if (!DATABASE_URL) {
-      throw new Error("DATABASE_URL is not defined after loading secrets.");
-    }
     const { processArticle } = await import("./actions/processArticles");
     const { updateMacroLensData } = await import(
       "./actions/updateMacroLensData"
     );
     const { updateStockData } = await import("./actions/updateStockData");
+
     const client = new Client({
-      connectionString: DATABASE_URL,
+      connectionString: config.DATABASE_URL,
     });
 
     const app = express();
-    const port = process.env.PORT || 3000;
     app.use(errorHandler);
 
     const listenForArticles = async (): Promise<void> => {
@@ -111,8 +103,8 @@ const initializeApp = async () => {
       }
     });
 
-    app.listen(port, () => {
-      logger.info(`Server running at port ${port}`);
+    app.listen(config.PORT, () => {
+      logger.info(`Server running at port ${config.PORT}`);
     });
 
     process.on("SIGINT", async () => {

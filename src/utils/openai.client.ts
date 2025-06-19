@@ -1,13 +1,12 @@
 import OpenAI from "openai";
+import { getConfig, loadConfig } from "../config/env.config";
 
 let instance: OpenAI | null = null;
 
-export const getOpenAIClient = (): OpenAI => {
-    if (!process.env.OPENAI_API_KEY) {
-        throw new Error("OPENAI_API_KEY is missing in the environment.");
-    }
-    if (!instance) {
-        instance = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    }
-    return instance;
-}
+export const getOpenAIClient = async (): Promise<OpenAI> => {
+  if (!instance) {
+    const config = await loadConfig();
+    instance = new OpenAI({ apiKey: config.OPENAI_API_KEY });
+  }
+  return instance;
+};

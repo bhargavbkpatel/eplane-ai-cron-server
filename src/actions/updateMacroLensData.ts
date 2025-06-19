@@ -1,6 +1,7 @@
 import axios from "axios";
 import { prisma } from "../lib/prisma";
 import logger from "../utils/logger/logger";
+import { getConfig } from "../config/env.config";
 
 const INVENTORY_FIELDS = [
   "Inventory Turnover",
@@ -12,10 +13,10 @@ const INVENTORY_FIELDS = [
   "Cost of Goods Sold",
   "COGS-to-Revenue",
 ];
-const ELASTIC_API_KEY = process.env.ELASTIC_API_KEY;
-const ELASTICSEARCH_URL = process.env.ELASTICSEARCH_URL;
+
 export const updateMacroLensData = async () => {
   try {
+    const config = getConfig();
     const currentYear = new Date().getFullYear();
     const startYear = currentYear - 2;
 
@@ -40,11 +41,11 @@ export const updateMacroLensData = async () => {
     try {
       logger.info("Fetching inventory data from Elasticsearch", {});
       const response = await axios.post(
-        `${ELASTICSEARCH_URL}/stocks_financials_quarterly/_search`,
+        `${config.ELASTICSEARCH_URL}/stocks_financials_quarterly/_search`,
         query,
         {
           headers: {
-            Authorization: `ApiKey ${ELASTIC_API_KEY}`,
+            Authorization: `ApiKey ${config.ELASTIC_API_KEY}`,
             "Content-Type": "application/json",
           },
         }

@@ -7,16 +7,16 @@ import {
 } from "../lib/helpers/flattenForIndex";
 import { prisma } from "../lib/prisma";
 import logger from "../utils/logger/logger";
-
-const GURUFOCUS_API_KEY = process.env.GURUFOCUS_API_KEY;
+import { getConfig } from "../config/env.config";
 
 export const updateStockData = async () => {
   try {
+    const config = getConfig();
     const allDocs: FlattenedDoc[] = [];
 
     for (const symbol of stockSymbols) {
-      const financialsUrl = `https://api.gurufocus.com/public/user/${GURUFOCUS_API_KEY}/stock/${symbol}/financials`;
-      const ratiosUrl = `https://api.gurufocus.com/public/user/${GURUFOCUS_API_KEY}/stock/${symbol}/keyratios`;
+      const financialsUrl = `https://api.gurufocus.com/public/user/${config.GURUFOCUS_API_KEY}/stock/${symbol}/financials`;
+      const ratiosUrl = `https://api.gurufocus.com/public/user/${config.GURUFOCUS_API_KEY}/stock/${symbol}/keyratios`;
 
       try {
         const [finRes, ratioRes] = await Promise.all([
@@ -56,8 +56,6 @@ export const updateStockData = async () => {
       logger.info("Created new homePageChartData in database");
     }
   } catch (error) {
-    logger.error("Error updating homepage chart data", {
-      error: error instanceof Error ? error.message : error,
-    });
+    logger.error("Error updating stock data", { error });
   }
 };

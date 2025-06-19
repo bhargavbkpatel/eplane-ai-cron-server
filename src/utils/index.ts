@@ -66,7 +66,9 @@ export async function textToMarkdown(content: string): Promise<string | null> {
       ${content}
   `;
 
-    const response = await openai.chat.completions.create({
+    const response = await (
+      await openai
+    ).chat.completions.create({
       model: "gpt-4-turbo",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.7,
