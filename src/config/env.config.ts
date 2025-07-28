@@ -9,6 +9,7 @@ interface Config {
   ELASTICSEARCH_URL: string;
   GURUFOCUS_API_KEY: string;
   PORT: number;
+  VERCEL_BLOB_TOKEN: string;
 }
 
 let config: Config | null = null;
@@ -28,7 +29,9 @@ export const loadConfig = async (): Promise<Config> => {
       ELASTICSEARCH_URL: secrets.ELASTICSEARCH_URL,
       GURUFOCUS_API_KEY: secrets.GURUFOCUS_API_KEY,
       PORT: Number(secrets.PORT) || 3000,
+      VERCEL_BLOB_TOKEN: secrets.VERCEL_BLOB_TOKEN ,
     };
+    process.env.DATABASE_URL = config.DATABASE_URL;
 
     logger.info("Configuration loaded successfully");
     return config;

@@ -12,6 +12,7 @@ interface Environment {
   ELASTICSEARCH_URL: string;
   GURUFOCUS_API_KEY: string;
   PORT: number;
+    VERCEL_BLOB_TOKEN: string;
 }
 
 let environment: Environment | null = null;
@@ -43,6 +44,7 @@ export const loadEnvironment = async (): Promise<Environment> => {
       ELASTICSEARCH_URL: secretData.ELASTICSEARCH_URL,
       GURUFOCUS_API_KEY: secretData.GURUFOCUS_API_KEY,
       PORT: secretData.PORT || 3000,
+      VERCEL_BLOB_TOKEN: secretData.VERCEL_BLOB_TOKEN ,
     };
 
     return environment;

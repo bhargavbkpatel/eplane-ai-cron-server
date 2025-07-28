@@ -1,0 +1,115 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudWatch dashboard for ePlaneAI Website Cron Service (ECS Fargate)
+
+Parameters:
+  ProjectName:
+    Type: String
+    Description: Project name (e.g., eplaneai-website-cron-service)
+
+  Environment:
+    Type: String
+    AllowedValues: [dev, prod]
+    Description: Deployment environment
+
+  FullLogGroupName:
+    Type: String
+    Description: Full CloudWatch Log Group name (e.g., /ecs/dev-eplaneai-website-cron-service)
+
+Resources:
+  Dashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: !Sub "${Environment}-${ProjectName}-dashboard"
+      DashboardBody: !Sub |
+        {
+          "start": "-PT6H",
+          "periodOverride": "inherit",
+          "widgets": [
+            {
+              "type": "text",
+              "x": 0,
+              "y": 0,
+              "width": 24,
+              "height": 1,
+              "properties": {
+                "markdown": "# ${Environment}-${ProjectName} - ECS Monitoring"
+              }
+            },
+            {
+              "type": "metric",
+              "x": 0,
+              "y": 1,
+              "width": 8,
+              "height": 6,
+              "properties": {
+                "title": "Running Task Count",
+                "metrics": [
+                  [ "AWS/ECS", "RunningTaskCount", "ClusterName", "${Environment}-${ProjectName}-cluster", "ServiceName", "${Environment}-${ProjectName}-service" ]
+                ],
+                "view": "timeSeries",
+                "stat": "Average",
+                "region": "${AWS::Region}"
+              }
+            },
+            {
+              "type": "metric",
+              "x": 8,
+              "y": 1,
+              "width": 8,
+              "height": 6,
+              "properties": {
+                "title": "CPU Utilization (%)",
+                "metrics": [
+                  [ "AWS/ECS", "CPUUtilization", "ClusterName", "${Environment}-${ProjectName}-cluster", "ServiceName", "${Environment}-${ProjectName}-service" ]
+                ],
+                "view": "timeSeries",
+                "stat": "Average",
+                "region": "${AWS::Region}"
+              }
+            },
+            {
+              "type": "metric",
+              "x": 16,
+              "y": 1,
+              "width": 8,
+              "height": 6,
+              "properties": {
+                "title": "Memory Utilization (%)",
+                "metrics": [
+                  [ "AWS/ECS", "MemoryUtilization", "ClusterName", "${Environment}-${ProjectName}-cluster", "ServiceName", "${Environment}-${ProjectName}-service" ]
+                ],
+                "view": "timeSeries",
+                "stat": "Average",
+                "region": "${AWS::Region}"
+              }
+            },
+            {
+              "type": "metric",
+              "x": 0,
+              "y": 7,
+              "width": 8,
+              "height": 6,
+              "properties": {
+                "title": "Task Failures (Stopped Task Count)",
+                "metrics": [
+                  [ "AWS/ECS", "StoppedTaskCount", "ClusterName", "${Environment}-${ProjectName}-cluster", "ServiceName", "${Environment}-${ProjectName}-service" ]
+                ],
+                "view": "timeSeries",
+                "stat": "Sum",
+                "region": "${AWS::Region}"
+              }
+            },
+            {
+              "type": "log",
+              "x": 8,
+              "y": 7,
+              "width": 16,
+              "height": 6,
+              "properties": {
+                "query": "SOURCE '${FullLogGroupName}' | fields @timestamp, @message | sort @timestamp desc | limit 20",
+                "region": "${AWS::Region}",
+                "title": "Recent Logs (${FullLogGroupName})"
+              }
+            }
+          ]
+        }

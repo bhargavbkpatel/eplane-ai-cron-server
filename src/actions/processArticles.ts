@@ -8,7 +8,6 @@ export const processArticle = async (id: string) => {
     const article = await prisma.articles.findUnique({
       where: { id },
     });
-
     if (!article) {
       logger.warn(`Article with ID ${id} not found.`);
       return { success: false, reason: "not_found" };

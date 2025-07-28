@@ -1,0 +1,144 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudWatch Alarms and SNS alerting for ePlaneAI Website Cron Service
+
+Parameters:
+  ProjectName:
+    Type: String
+    Description: Project name (e.g., eplaneai-website-cron-service)
+  Environment:
+    Type: String
+    AllowedValues: [dev, prod]
+    Description: Deployment environment
+  AlarmEmails:
+    Type: CommaDelimitedList
+    Description: Comma-separated list of emails to subscribe (e.g. "me@example.com,you@example.com")
+
+Conditions:
+  HasEmail1: !Not [!Equals [!Select [0, !Ref AlarmEmails], ""]]
+  HasEmail2: !Not [!Equals [!Select [1, !Ref AlarmEmails], ""]]
+
+Resources:
+  AlarmTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub "${Environment}-${ProjectName}-alarm-topic"
+      DisplayName: !Sub "${Environment}-${ProjectName}-AlarmTopic"
+
+  AlarmEmailSubscription1:
+    Type: AWS::SNS::Subscription
+    Condition: HasEmail1
+    Properties:
+      Protocol: email
+      Endpoint: !Select [0, !Ref AlarmEmails]
+      TopicArn: !Ref AlarmTopic
+
+  AlarmEmailSubscription2:
+    Type: AWS::SNS::Subscription
+    Condition: HasEmail2
+    Properties:
+      Protocol: email
+      Endpoint: !Select [1, !Ref AlarmEmails]
+      TopicArn: !Ref AlarmTopic
+
+  TaskFailureAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${Environment}-${ProjectName}-TaskFailure"
+      AlarmDescription: "Task stopped unexpectedly or fewer running than desired"
+      EvaluationPeriods: 1
+      DatapointsToAlarm: 1
+      Threshold: 0
+      ComparisonOperator: LessThanOrEqualToThreshold
+      TreatMissingData: breaching
+      Metrics:
+        - Id: running
+          MetricStat:
+            Metric:
+              Namespace: AWS/ECS
+              MetricName: RunningTaskCount
+              Dimensions:
+                - Name: ClusterName
+                  Value: !Sub "${Environment}-${ProjectName}-cluster"
+                - Name: ServiceName
+                  Value: !Sub "${Environment}-${ProjectName}-service"
+            Period: 60
+            Stat: Average
+          ReturnData: false
+
+        - Id: desired
+          MetricStat:
+            Metric:
+              Namespace: AWS/ECS
+              MetricName: DesiredTaskCount
+              Dimensions:
+                - Name: ClusterName
+                  Value: !Sub "${Environment}-${ProjectName}-cluster"
+                - Name: ServiceName
+                  Value: !Sub "${Environment}-${ProjectName}-service"
+            Period: 60
+            Stat: Average
+          ReturnData: false
+
+        - Id: taskDiff
+          Expression: "running - desired"
+          Label: "Task Count Difference"
+          ReturnData: true
+      AlarmActions:
+        - !Ref AlarmTopic
+      OKActions:
+        - !Ref AlarmTopic
+
+  HighCPUAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${Environment}-${ProjectName}-HighCPU"
+      AlarmDescription: "ECS CPU usage exceeds 80%"
+      Namespace: AWS/ECS
+      MetricName: CPUUtilization
+      Dimensions:
+        - Name: ClusterName
+          Value: !Sub "${Environment}-${ProjectName}-cluster"
+        - Name: ServiceName
+          Value: !Sub "${Environment}-${ProjectName}-service"
+      Statistic: Average
+      Period: 60
+      EvaluationPeriods: 2
+      Threshold: 80
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+      Unit: Percent
+      AlarmActions:
+        - !Ref AlarmTopic
+      OKActions:
+        - !Ref AlarmTopic
+
+  HighMemoryAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${Environment}-${ProjectName}-HighMemory"
+      AlarmDescription: "ECS memory usage exceeds 90%"
+      Namespace: AWS/ECS
+      MetricName: MemoryUtilization
+      Dimensions:
+        - Name: ClusterName
+          Value: !Sub "${Environment}-${ProjectName}-cluster"
+        - Name: ServiceName
+          Value: !Sub "${Environment}-${ProjectName}-service"
+      Statistic: Average
+      Period: 60
+      EvaluationPeriods: 2
+      Threshold: 90
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+      Unit: Percent
+      AlarmActions:
+        - !Ref AlarmTopic
+      OKActions:
+        - !Ref AlarmTopic
+
+Outputs:
+  AlarmTopicArn:
+    Description: SNS Topic ARN for ECS service alarms
+    Value: !Ref AlarmTopic
+    Export:
+      Name: !Sub "${AWS::StackName}-AlarmTopicArn"
