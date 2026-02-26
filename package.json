@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.525.0",
+    "@aws-sdk/client-secrets-manager": "^3.995.0",
     "@prisma/client": "^6.7.0",
     "@vercel/blob": "^1.1.1",
     "axios": "^1.11.0",
